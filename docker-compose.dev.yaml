@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+
+  vad-service:
+    stdin_open: true
+    tty: true
+    image: beetee/vad-service:1.0.0-build
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+      target: build
+    env_file:
+      - ./main.env
+    volumes:
+      - ./proto:/proto
+      - ./src:/src
+      - ./model:/model
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    ports:
+      - 50053:50053
+    working_dir: /src
+    command:
+      [
+        "sh",
+        "-c",
+        "python -m grpc_tools.protoc -I / --python_out=/src --pyi_out=/src --grpc_python_out=/src /proto/vad.proto && python serve.py"
+      ]

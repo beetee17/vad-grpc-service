@@ -1,0 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cu118
+
+torch==2.3.0
+torchaudio==2.3.0
+numpy==1.26.4
+
+# grpc tools
+grpcio==1.62.1
+grpcio-tools==1.62.1

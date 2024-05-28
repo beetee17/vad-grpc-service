@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+service VoiceActivityDetector {
+    rpc detect_voice_activity(VoiceActivityDetectorRequest) returns (VoiceActivityDetectorResponse) {}
+}
+
+message VoiceActivityDetectorRequest {
+    bytes audio_data = 1;
+}
+
+message VoiceActivityDetectorResponse {
+    float confidence = 1;
+}
