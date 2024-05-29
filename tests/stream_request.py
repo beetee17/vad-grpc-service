@@ -9,8 +9,8 @@ import grpc
 
 from proto import vad_pb2, vad_pb2_grpc
 
-HOST = "172.20.0.2"
-PORT = 50052
+HOST = "localhost"
+PORT = 60053
 
 CHUNK_DURATION_MS = 100
 SAMPLE_RATE = 16000

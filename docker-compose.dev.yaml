@@ -24,7 +24,7 @@ services:
               count: 1
               capabilities: [ gpu ]
     ports:
-      - 50053:50053
+      - 60053:50053
     working_dir: /src
     command:
       [
