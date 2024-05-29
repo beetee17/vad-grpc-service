@@ -7,7 +7,7 @@ This is a repository to serve a Voice Activity Detection (VAD) Service via FastA
 ### 1. Git clone the repository
 
 ```sh
-git clone https://github.com/test-dan-run/ctranslate-deploy.git
+git clone https://github.com/beetee17/vad-grpc-service.git
 ```
 
 ### 2. Download the weights
@@ -77,12 +77,16 @@ python -m grpc_tools.protoc -I . --python_out=./src --pyi_out=./src --grpc_pytho
 While the server is up, try streaming requests via the microphone with `tests/stream_request.py`. 
 
 ```sh
-source ~/grpc_env/bin/activate
+python -m venv ~/vad_client_env
+source ~/vad_client_env/bin/activate
+pip install -r client_requirements.txt
 cd tests
-python sample_request.py
+python stream_request.py
 ```
 
 #### Note
+
+You may need to install additional dependencies to run the test script.
 
 Make sure to verify the hostname and port number in the python script match that of the docker container:
 

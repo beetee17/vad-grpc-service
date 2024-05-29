@@ -1,5 +1,5 @@
 """ test VAD service """
-# python3 -m grpc_tools.protoc -I . --python_out=./tests --pyi_out=./tests --grpc_python_out=./tests proto/asr.proto
+# python3 -m grpc_tools.protoc -I . --python_out=./tests --pyi_out=./tests --grpc_python_out=./tests proto/vad.proto
 
 import logging
 import numpy as np
