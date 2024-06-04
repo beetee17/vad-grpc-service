@@ -3,8 +3,9 @@
 
 import logging
 import numpy as np
+import soundfile as sf
 import pyaudio
-
+from tempfile import NamedTemporaryFile
 import grpc
 
 from proto import vad_pb2, vad_pb2_grpc
@@ -15,27 +16,6 @@ PORT = 60053
 CHUNK_DURATION_MS = 100
 SAMPLE_RATE = 16000
 FRAMES_PER_BUFFER=int(SAMPLE_RATE/1000 * CHUNK_DURATION_MS)
-
-def int2float(sound):
-    """
-    Convert an array of integer audio samples to floating-point representation.
-
-    Parameters:
-    - sound (numpy.ndarray): Input array containing integer audio samples.
-
-    Returns:
-    - numpy.ndarray: Array of floating-point audio samples normalized to the range [-1, 1].
-    """
-    sound = sound.astype('float32')
-
-    # Scale the floating-point values to the range [-1, 1] if the input audio is not silent
-    if np.abs(sound).max() > 0: sound *= 1 / 32768
-
-    # Remove single-dimensional entries from the shape of the array
-    sound = sound.squeeze()
-
-    return sound
-
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -49,7 +29,7 @@ if __name__ == "__main__":
         audio = pyaudio.PyAudio()
         
         stream = audio.open(
-            format=pyaudio.paInt16,
+            format=pyaudio.paFloat32,
             channels=1,
             rate=SAMPLE_RATE,
             input=True,
@@ -61,11 +41,19 @@ if __name__ == "__main__":
         while True:
             audio_chunk = stream.read(FRAMES_PER_BUFFER)
             
-            audio_int16 = np.frombuffer(audio_chunk, np.int16)
-
-            audio_float32 = int2float(audio_int16)
-            
-            request = vad_pb2.VoiceActivityDetectorRequest(audio_data=audio_float32.tobytes())
+            data = np.frombuffer(audio_chunk, np.float32)
+            with NamedTemporaryFile(suffix=".wav") as f:
+                sf.write(
+                    file=f,
+                    data=data,
+                    samplerate=SAMPLE_RATE, 
+                    format='WAV', 
+                    subtype='PCM_16'
+                )
+                f.seek(0)
+                audio_data = f.read()
+                
+            request = vad_pb2.VoiceActivityDetectorRequest(audio_data=audio_data)
             response = stub.detect_voice_activity(request)
             
             logging.info("Voice Detected Confidence: %0.2f", response.confidence)

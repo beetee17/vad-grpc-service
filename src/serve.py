@@ -4,6 +4,8 @@ import logging
 from time import perf_counter
 from concurrent import futures
 
+from tempfile import NamedTemporaryFile
+import librosa
 import torch
 import numpy as np
 
@@ -32,17 +34,26 @@ class VoiceActivityDetectorService(vad_pb2_grpc.VoiceActivityDetectorServicer):
     def detect_voice_activity(self, request, context):
         infer_start = perf_counter()
         
-        audio_float32 = np.frombuffer(request.audio_data, np.float32).copy()
-        
-        tensor = torch.from_numpy(audio_float32).to(self.device)
-        
-        confidence = self.model(tensor, SAMPLE_RATE).float()
-        
-        infer_end = perf_counter()
-        
-        logging.info("Inference elapsed time: %s", infer_end - infer_start)
-        
-        return vad_pb2.VoiceActivityDetectorResponse(confidence=confidence)
+        with NamedTemporaryFile(suffix=".wav") as f:
+            f.write(request.audio_data)
+            f.seek(0)
+            audio_float32, _ = librosa.load(
+                path=f.name,
+                sr=SAMPLE_RATE,
+                dtype=np.float32
+            )
+            
+            tensor = torch.from_numpy(audio_float32).to(self.device)
+            
+            confidence = self.model(tensor, SAMPLE_RATE)
+            
+            infer_end = perf_counter()
+            
+            logging.info("Voice Detected Confidence: %0.2f", confidence)
+            
+            logging.info("Inference elapsed time: %s", infer_end - infer_start)
+            
+            return vad_pb2.VoiceActivityDetectorResponse(confidence=confidence.float())
 
 def serve():
     """Serves VAD Model"""

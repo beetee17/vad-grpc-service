@@ -1,5 +1,5 @@
 grpcio==1.64.0
 grpcio-tools==1.62.1
-
+soundfile==0.12.1
 numpy==1.26.4
 PyAudio==0.2.14
