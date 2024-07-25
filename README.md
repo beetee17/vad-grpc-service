@@ -1,6 +1,6 @@
 # vad-grpc-service
 
-This is a repository to serve a Voice Activity Detection (VAD) Service via FastAPI. The model being served is a pre-trained enterprise-grade Voice Activity Detector known as Silero[https://github.com/snakers4/silero-vad/].
+This is a repository to serve a Voice Activity Detection (VAD) Service via FastAPI. The model being served is a pre-trained enterprise-grade Voice Activity Detector known as [Silero](https://github.com/snakers4/silero-vad/).
 
 ## Setup
 
